@@ -1281,24 +1281,35 @@ if(tgUser){
 let telegramID = tgUser.id;
 
 
-// Find phone using telegram_lookup
+// Find player using telegramID inside players
 
-db.ref("telegram_lookup/" + telegramID).once("value",function(snapshot){
+db.ref("players").once("value", function(snapshot){
+
+let foundID = null;
+
+snapshot.forEach(function(player){
+
+let data = player.val();
+
+if(data.telegram_id == telegramID){
+
+foundID = player.key;
+
+}
+
+});
 
 
-let data = snapshot.val();
+if(!foundID){
 
-
-if(!data){
-
-alert("Account not found. Please register with the bot first.");
+alert("Account not found");
 
 return;
 
 }
 
 
-let phone = data;
+let phone = foundID;
 
 
 // Save player ID for game use
