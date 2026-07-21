@@ -1427,6 +1427,22 @@ function submitDeposit(){
 
 let playerID = localStorage.getItem("playerID");
 
+if(!playerID && Telegram.WebApp.initDataUnsafe.user){
+
+playerID = Telegram.WebApp.initDataUnsafe.user.id.toString();
+
+localStorage.setItem("playerID", playerID);
+
+}
+
+if(!playerID){
+
+alert("Player account not found");
+
+return;
+
+}
+
 let amount = Number(
 document.getElementById("depositAmount").value
 );
