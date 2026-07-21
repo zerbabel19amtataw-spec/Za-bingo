@@ -1066,6 +1066,40 @@ var db;
 firebase.initializeApp(firebaseConfig);
 
 db = firebase.database();  
+
+function createNewPlayer(tgUser){
+
+    let playerID = "player_" + tgUser.id;
+
+    let playerData = {
+
+        telegram_id: tgUser.id,
+
+        username: tgUser.username || "",
+
+        first_name: tgUser.first_name || "",
+
+        balance: 0,
+
+        gamesPlayed: 0,
+
+        gamesWon: 0,
+
+        createdAt: Date.now()
+
+    };
+
+
+    db.ref("players/" + playerID).set(playerData);
+
+
+    localStorage.setItem("playerID", playerID);
+
+
+    console.log("New player created:", playerID);
+
+}
+
 loadFixedCartelas();
 watchRoomButtons();
 
@@ -1302,7 +1336,7 @@ foundID = player.key;
 
 if(!foundID){
 
-alert("Account not found");
+createNewPlayer(tgUser);
 
 return;
 
