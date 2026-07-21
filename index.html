@@ -1069,7 +1069,7 @@ db = firebase.database();
 
 function createNewPlayer(tgUser){
 
-    let playerID = "player_" + tgUser.id;
+    let playerID = tgUser.id.toString();
 
     let playerData = {
 
@@ -1078,6 +1078,8 @@ function createNewPlayer(tgUser){
         username: tgUser.username || "",
 
         first_name: tgUser.first_name || "",
+
+        phone: "",
 
         balance: 0,
 
@@ -1311,6 +1313,26 @@ let tgUser = Telegram.WebApp.initDataUnsafe.user;
 
 if(tgUser){
 
+db.ref("telegram_lookup/" + tgUser.id).once("value", function(snapshot){
+
+    if(snapshot.exists()){
+
+        let playerID = snapshot.val().playerID;
+
+        localStorage.setItem("playerID", playerID);
+
+        console.log("Linked player:", playerID);
+
+        loadProfile();
+
+    }
+    else{
+
+        console.log("No linked account found");
+
+    }
+
+});
 
 let telegramID = tgUser.id;
 
@@ -1572,7 +1594,7 @@ playerID;
 
 
 document.getElementById("profilePhone").innerHTML =
-data.phone || playerID;
+data.phone || "No phone";
 
 
 document.getElementById("profileUsername").innerHTML =
