@@ -710,7 +710,6 @@ Br
 🎮 GAME ROOM
 </button>
 
-<button id="profileBtn" onclick="openProfile()">👤 PROFILE</button>
 
 </div>
 
@@ -1547,88 +1546,7 @@ function openGameRoom(){
 showScreen("gameRoom");
 
 }
-function openProfile(){
 
-showScreen("profileScreen");
-
-loadProfile();
-
-}
-
-
-function loadProfile(){
-
-let playerID = localStorage.getItem("playerID");
-
-
-if(!playerID){
-
-alert("Player not found");
-
-return;
-
-}
-
-
-db.ref("players/" + playerID).once("value", function(snapshot){
-
-
-let data = snapshot.val();
-
-
-if(!data){
-
-alert("Profile not found");
-
-return;
-
-}
-
-
-document.getElementById("profileName").innerHTML =
-data["user name"] || "No Name";
-
-
-document.getElementById("profileID").innerHTML =
-playerID;
-
-
-document.getElementById("profilePhone").innerHTML =
-data.phone || "No phone";
-
-
-document.getElementById("profileUsername").innerHTML =
-"@" + (data["user name"] || "unknown");
-
-
-document.getElementById("profileBalance").innerHTML =
-Number(data.balance || 0).toFixed(2);
-
-
-let played = data.gamesPlayed || 0;
-
-let won = data.gamesWon || 0;
-
-
-document.getElementById("gamesPlayed").innerHTML =
-played;
-
-
-document.getElementById("gamesWon").innerHTML =
-won;
-
-
-let rate = played > 0 ? (won / played) * 100 : 0;
-
-
-document.getElementById("winRate").innerHTML =
-rate.toFixed(0) + "%";
-
-
-});
-
-
-}
 
 
 function backHome(){
@@ -3025,35 +2943,7 @@ OK
 
 </div>
 
-<!-- PROFILE SCREEN -->
 
-<div id="profileScreen" class="screen">
-
-<h1>👤 PROFILE</h1>
-
-<p>Player Name: <span id="profileName">Loading...</span></p>
-
-<p>Player ID: <span id="profileID">Loading...</span></p>
-
-<p>Phone: <span id="profilePhone">Loading...</span></p>
-
-<p>Username: <span id="profileUsername">Loading...</span></p>
-
-<h2>💰 Balance: <span id="profileBalance">0</span> Br</h2>
-
-<h2>🎮 Statistics</h2>
-
-<p>• Games Played: <span id="gamesPlayed">0</span></p>
-
-<p>• Games Won: <span id="gamesWon">0</span></p>
-
-<p>• Win Rate: <span id="winRate">0%</span></p>
-
-<button class="back" onclick="backHome()">
-⬅ BACK
-</button>
-
-</div>
 
 </body>
 </html>
