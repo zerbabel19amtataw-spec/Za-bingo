@@ -1476,6 +1476,8 @@ return;
 let depositID = "DEP_" + Date.now();
 
 
+let txId = "TX_" + Date.now();
+
 db.ref("ZA_Bingo_V3/deposits/" + depositID).set({
 
 playerID: playerID,
@@ -1485,6 +1487,8 @@ amount: amount,
 method: depositMethod,
 
 sms: sms,
+
+txId: txId,
 
 status:"pending",
 
