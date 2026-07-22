@@ -785,7 +785,7 @@ VERIFY DEPOSIT
 
 <br>
 
-<button>
+<button onclick="submitWithdraw()">
 REQUEST WITHDRAW
 </button>
 
@@ -1572,6 +1572,121 @@ alert("Deposit approved");
 function openWithdraw(){
 
 showScreen("withdrawScreen");
+
+}
+
+function submitWithdraw(){
+
+let playerID = localStorage.getItem("playerID");
+
+let amount = Number(
+document.getElementById("withdrawAmount").value
+);
+
+let phone =
+document.getElementById("withdrawPhone").value;
+
+
+if(!playerID){
+
+alert("Player account not found");
+
+return;
+
+}
+
+
+if(!amount || !phone){
+
+alert("Enter amount and phone number");
+
+return;
+
+}
+
+
+// Check balance
+
+db.ref("players/" + playerID + "/balance")
+.once("value", function(snapshot){
+
+
+let balance = snapshot.val() || 0;
+
+
+if(balance < amount){
+
+alert("Insufficient balance");
+
+return;
+
+}
+
+
+// Deduct balance immediately
+
+db.ref("players/" + playerID + "/balance")
+.transaction(function(currentBalance){
+
+
+if(currentBalance < amount){
+
+return;
+
+}
+
+
+return currentBalance - amount;
+
+
+}, function(error, committed){
+
+
+if(error || !committed){
+
+alert("Withdraw failed");
+
+return;
+
+}
+
+
+
+// Create withdraw request after deduction
+
+let withdrawID = "WITH_" + Date.now();
+
+
+
+db.ref("ZA_Bingo_V3/withdraws/" + withdrawID).set({
+
+playerID: playerID,
+
+amount: amount,
+
+phone: phone,
+
+status:"pending",
+
+time: Date.now()
+
+});
+
+
+
+alert("Withdraw request sent");
+
+
+document.getElementById("withdrawAmount").value="";
+
+document.getElementById("withdrawPhone").value="";
+
+
+});
+
+
+});
+
 
 }
 
