@@ -81,9 +81,10 @@ background:#8b0000;
 
 
 .selected{
-background:#008000;
+background:#008000 !important;
+color:white !important;
+box-shadow:0 0 15px #00ff00 !important;
 }
-
 
 /* CARTELA SELECT */
 
@@ -606,7 +607,7 @@ color:#ffd700;
 
 box-shadow:
 0 0 15px #8b0000;
-
+position:relative;
 }
 
 
@@ -637,17 +638,17 @@ text-align:center;
 .depositScreen button,
 .withdrawScreen button{
 
-width:70%;
+width:35%;
 
-padding:12px;
+padding:7px;
 
-margin:8px;
+margin:5px;
 
-font-size:18px;
+font-size:13px;
 
 font-weight:bold;
 
-border-radius:12px;
+border-radius:8px;
 
 background:
 linear-gradient(
@@ -661,12 +662,73 @@ color:#ffd700;
 border:2px solid #b8860b;
 
 box-shadow:
-0 0 10px #8b0000;
+0 0 8px #8b0000;
 
 }
 
 #profileBtn{
     margin-top:-20px;
+}
+
+.paymentInfo{
+
+background:
+linear-gradient(
+145deg,
+#222,
+#000
+);
+
+border:2px solid #b8860b;
+
+border-radius:15px;
+
+padding:15px;
+
+margin:15px auto;
+
+width:85%;
+
+color:#ffd700;
+
+box-shadow:0 0 10px #8b0000;
+
+}
+
+
+.paymentInfo button{
+
+width:40%;
+
+padding:8px;
+
+font-size:16px;
+
+margin:5px;
+
+}
+
+.depositScreen .back,
+.withdrawScreen .back{
+
+    position:absolute;
+
+    top:20px;
+
+    left:15px;
+
+    width:80px;
+
+    padding:8px;
+
+    font-size:14px;
+
+    margin:0;
+
+    background:#8b0000;
+
+    color:white;
+
 }
 
 </style>
@@ -720,19 +782,38 @@ Br
 
 <div class="depositScreen">
 
-<h1>
-💳 DEPOSIT
-</h1>
+
 
 <h3>
-Choose payment method
+💳 Deposit Accounts
 </h3>
 
-<button onclick="selectDepositMethod('Telebirr')">
+<p>
+📱 Telebirr:
+<br>
+<span id="telebirrNumber">0985661720</span>
+
+<button onclick="copyText('telebirrNumber')">
+COPY
+</button>
+</p>
+
+
+<p>
+🏦 CBE Birr:
+<br>
+<span id="cbeNumber">0985661720</span>
+
+<button onclick="copyText('cbeNumber')">
+COPY
+</button>
+</p>
+
+<button id="telebirrBtn" onclick="selectDepositMethod('Telebirr', this)">
 📱 Telebirr
 </button>
 
-<button onclick="selectDepositMethod('CBE Birr')">
+<button id="cbeBtn" onclick="selectDepositMethod('CBE Birr', this)">
 🏦 CBE Birr
 </button>
 
@@ -775,6 +856,17 @@ VERIFY DEPOSIT
 💸 WITHDRAW
 </h1>
 
+<h3>
+Withdraw Method
+</h3>
+
+<button id="withdrawTelebirrBtn" onclick="selectWithdrawMethod('Telebirr', this)">
+📱 Telebirr
+</button>
+
+<button id="withdrawCbeBtn" onclick="selectWithdrawMethod('CBE Birr', this)">
+🏦 CBE Birr
+</button>
 
 <input id="withdrawAmount" placeholder="Amount">
 
@@ -1114,6 +1206,19 @@ let autoMarkEnabled = true;
 let gameBanned = false;
 
 let depositMethod = "";
+
+let withdrawMethod = "";
+
+function selectWithdrawMethod(method, btn){
+
+    withdrawMethod = method;
+
+    document.getElementById("withdrawTelebirrBtn").classList.remove("selected");
+    document.getElementById("withdrawCbeBtn").classList.remove("selected");
+
+    btn.classList.add("selected");
+
+}
 
 // Fixed Cartelas (we keep these forever)
 
@@ -1511,11 +1616,14 @@ function openDeposit(){
 showScreen("depositScreen");
 
 }
-function selectDepositMethod(method){
+function selectDepositMethod(method, btn){
 
 depositMethod = method;
 
-alert(method + " selected");
+document.getElementById("telebirrBtn").classList.remove("selected");
+document.getElementById("cbeBtn").classList.remove("selected");
+
+btn.classList.add("selected");
 
 }
 
@@ -3057,6 +3165,15 @@ showScreen("screen1");
 
 }
 
+function copyText(id){
+
+let text = document.getElementById(id).innerText;
+
+navigator.clipboard.writeText(text);
+
+alert("Copied: " + text);
+
+}
 
 
 </script>
