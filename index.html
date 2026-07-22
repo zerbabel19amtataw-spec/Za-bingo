@@ -1581,7 +1581,7 @@ return;
 let depositID = "DEP_" + Date.now();
 
 
-let txId = "TX_" + Date.now();
+let txId = "";
 
 db.ref("ZA_Bingo_V3/deposits/" + depositID).set({
 
@@ -1768,7 +1768,7 @@ return;
 
 let withdrawID = "WITH_" + Date.now();
 
-
+console.log("Sending withdraw request", withdrawID);
 
 db.ref("ZA_Bingo_V3/withdraws/" + withdrawID).set({
 
