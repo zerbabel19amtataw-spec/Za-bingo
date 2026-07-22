@@ -1605,6 +1605,15 @@ return;
 }
 
 
+if(amount < 50){
+
+alert("Minimum withdrawal amount is 50 Br");
+
+return;
+
+}
+
+
 // Check balance
 
 db.ref("players/" + playerID + "/balance")
