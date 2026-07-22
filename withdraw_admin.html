@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>ZA Bingo Withdraw Admin</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<style>
+
+body{
+background:#111;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+
+h1{
+color:#ffd700;
+}
+
+
+.card{
+
+background:#222;
+
+border:2px solid #b8860b;
+
+border-radius:15px;
+
+padding:15px;
+
+margin:15px;
+
+}
+
+
+button{
+
+padding:12px;
+
+margin:5px;
+
+border:none;
+
+border-radius:10px;
+
+font-weight:bold;
+
+color:white;
+
+background:#006400;
+
+}
+
+
+.reject{
+
+background:#8b0000;
+
+}
+
+
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+
+</head>
+
+
+<body>
+
+
+<h1>💸 ZA Bingo Withdraw Admin</h1>
+
+
+<h2>Pending Withdrawals</h2>
+
+
+<div id="withdrawList"></div>
+
+
+
+
+<script>
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyAV2-bOqQUsSk45RqmeeazxxLuqyEGpV1w",
+
+authDomain: "za-bingo-7ad31.firebaseapp.com",
+
+databaseURL: "https://za-bingo-7ad31-default-rtdb.firebaseio.com/",
+
+projectId: "za-bingo-7ad31",
+
+storageBucket: "za-bingo-7ad31.firebasestorage.app",
+
+messagingSenderId: "713392974772",
+
+appId: "1:713392974772:web:0e14359197fd522c06a0e1"
+
+};
+
+
+
+firebase.initializeApp(firebaseConfig);
+
+
+let db = firebase.database();
+
+
+
+
+loadWithdraws();
+
+
+
+
+
+function loadWithdraws(){
+
+
+db.ref("ZA_Bingo_V3/withdraws")
+
+.on("value", function(snapshot){
+
+
+
+let box = document.getElementById("withdrawList");
+
+
+box.innerHTML="";
+
+
+
+snapshot.forEach(function(child){
+
+
+
+let data = child.val();
+
+let id = child.key;
+
+
+
+if(data.status == "pending"){
+
+
+
+box.innerHTML += `
+
+
+<div class="card">
+
+
+<h3>💸 Withdrawal Request</h3>
+
+
+<p>
+Player ID:
+<br>
+${data.playerID}
+</p>
+
+
+<p>
+Amount:
+<br>
+${data.amount} Br
+</p>
+
+
+<p>
+Phone:
+<br>
+${data.phone}
+</p>
+
+
+<p>
+Time:
+<br>
+${new Date(data.time).toLocaleString()}
+</p>
+
+
+
+<button onclick="approveWithdraw('${id}')">
+
+✅ APPROVE
+
+</button>
+
+
+
+<button class="reject" onclick="rejectWithdraw('${id}')">
+
+❌ REJECT
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+}
+
+
+
+});
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+// APPROVE ONLY
+// NO BALANCE CHANGE
+
+function approveWithdraw(id){
+
+
+
+db.ref("ZA_Bingo_V3/withdraws/"+id)
+
+.once("value", function(snapshot){
+
+
+
+let withdraw = snapshot.val();
+
+
+
+if(!withdraw){
+
+alert("Withdraw not found");
+
+return;
+
+}
+
+
+
+if(withdraw.status!="pending"){
+
+alert("Already processed");
+
+return;
+
+}
+
+
+
+db.ref("ZA_Bingo_V3/withdraws/"+id)
+
+.update({
+
+status:"approved",
+
+approvedAt:Date.now()
+
+});
+
+
+
+alert("Withdrawal approved");
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+// REJECT + REFUND
+
+function rejectWithdraw(id){
+
+
+
+db.ref("ZA_Bingo_V3/withdraws/"+id)
+
+.once("value", function(snapshot){
+
+
+
+let withdraw = snapshot.val();
+
+
+
+if(!withdraw){
+
+alert("Withdraw not found");
+
+return;
+
+}
+
+
+
+if(withdraw.status!="pending"){
+
+alert("Already processed");
+
+return;
+
+}
+
+
+
+let playerID = withdraw.playerID;
+
+let amount = Number(withdraw.amount);
+
+
+
+
+// Refund balance
+
+db.ref("players/"+playerID+"/balance")
+
+.transaction(function(balance){
+
+
+return (balance || 0) + amount;
+
+
+}, function(error, committed){
+
+
+
+if(error || !committed){
+
+alert("Refund failed");
+
+return;
+
+}
+
+
+
+// Change status after refund
+
+
+db.ref("ZA_Bingo_V3/withdraws/"+id)
+
+.update({
+
+status:"rejected",
+
+rejectedAt:Date.now()
+
+});
+
+
+
+alert("Withdraw rejected and refunded");
+
+
+});
+
+
+
+});
+
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
