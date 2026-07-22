@@ -2066,14 +2066,24 @@ if(window.Telegram && Telegram.WebApp){
 
                 localStorage.setItem("playerID", playerID);
 
+                checkPlayerBalance(stake, playerID);
+
+            }
+            else{
+
+                alert("Player account not found");
+
             }
 
         });
+
+        return;
 
     }
 
 }
 
+checkPlayerBalance(stake, playerID);
 
 if(!playerID){
 
@@ -2109,79 +2119,6 @@ return;
 
 }
 
-// CHECK BALANCE BEFORE JOINING
-
-db.ref("players/" + playerID + "/balance").once("value", function(balanceSnap){
-
-let balance = balanceSnap.val() || 0;
-
-
-if(balance < stake){
-
-alert("Insufficient balance");
-
-return;
-
-}
-
-
-// Deduct stake safely
-
-db.ref("players/" + playerID + "/balance").transaction(function(balance){
-
-    if(balance === null){
-        return 0;
-    }
-
-    if(balance < stake){
-        return;
-    }
-
-    return balance - stake;
-
-}, function(error, committed){
-
-    if(error){
-        alert("Balance error");
-        return;
-    }
-
-    if(!committed){
-        alert("Insufficient balance");
-        return;
-    }
-
-
-    // Continue joining room
-
-    db.ref("ZA_Bingo_V3/rooms/room" + stake + "/players/" + playerID).set({
-
-        cartelas: selectedCartelas,
-
-        status:"playing"
-
-    });
-    
-    db.ref("players/" + playerID + "/gamesPlayed")
-.transaction(function(count){
-
-    return (count || 0) + 1;
-
-});
-    
-selectedCartelas.forEach(function(card){
-
-db.ref("ZA_Bingo_V3/rooms/room" + stake + "/takenCartelas/" + card)
-.set(true);
-
-});
-
-});
-
-
-
-
-});
 
 
 
@@ -2335,7 +2272,92 @@ db.ref("ZA_Bingo_V3/rooms/room"+stake+"/countdown").set(25);
 
 
 }
+function checkPlayerBalance(stake, playerID){
 
+db.ref("players/" + playerID + "/balance").once("value", function(balanceSnap){
+
+let balance = balanceSnap.val() || 0;
+
+
+if(balance < stake){
+
+alert("Insufficient balance");
+
+return;
+
+}
+// Deduct stake
+db.ref("players/" + playerID + "/balance").transaction(function(currentBalance){
+
+    if(currentBalance < stake){
+        return;
+    }
+
+    return currentBalance - stake;
+
+}, function(error, committed){
+
+    if(error || !committed){
+
+        alert("Insufficient balance");
+
+        return;
+
+    }
+
+
+    // Continue joining after payment
+
+    db.ref("ZA_Bingo_V3/rooms/room" + stake + "/players/" + playerID).set({
+
+        cartelas: selectedCartelas,
+
+        status:"playing"
+
+    });
+
+
+    selectedCartelas.forEach(function(card){
+
+        db.ref("ZA_Bingo_V3/rooms/room" + stake + "/takenCartelas/" + card)
+        .set(true);
+
+    });
+
+
+    showScreen("waitingScreen");
+
+
+});
+
+return;
+
+// Continue joining room
+
+db.ref("ZA_Bingo_V3/rooms/room" + stake + "/players/" + playerID).set({
+
+    cartelas: selectedCartelas,
+
+    status:"playing"
+
+});
+
+
+selectedCartelas.forEach(function(card){
+
+db.ref("ZA_Bingo_V3/rooms/room" + stake + "/takenCartelas/" + card)
+.set(true);
+
+});
+
+
+showScreen("waitingScreen");
+
+
+});
+
+
+}
 function cancelCountdown(){
 
 if(currentStake==0){
