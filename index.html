@@ -1470,7 +1470,7 @@ return;
 
 
 let phone = foundID;
-
+localStorage.setItem("playerID", foundID);
 
 // Save player ID for game use
 
@@ -2085,13 +2085,7 @@ if(window.Telegram && Telegram.WebApp){
 
 checkPlayerBalance(stake, playerID);
 
-if(!playerID){
 
-playerID = "player_" + Date.now();
-
-localStorage.setItem("playerID", playerID);
-
-}
 
 // Save player account
 
